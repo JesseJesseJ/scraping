@@ -1,0 +1,40 @@
+!pip install beautifulsoup4
+# Importar las librerías necesarias
+import requests
+from bs4 import BeautifulSoup
+
+# Definir la URL del sitio web a hacer scraping
+url = 'https://huesped.org.ar/'
+
+# Realizar la solicitud HTTP para obtener el contenido de la página
+try:
+    response = requests.get(url)
+    # Verificar si la solicitud fue exitosa
+    if response.status_code == 200:
+        # Obtener el contenido de la respuesta
+        content = response.content
+
+        # Utilizar BeautifulSoup para parsear el contenido HTML
+        soup = BeautifulSoup(content, 'html.parser')
+
+        # Extraer todos los párrafos (<p>) del contenido
+        paragraphs = soup.find_all('p')
+        
+        # Preparar una lista para almacenar el texto de cada párrafo
+        extracted_texts = []
+
+        # Recorrer cada párrafo, extraer el texto y posiblemente los atributos de clase
+        for paragraph in paragraphs:
+            text = paragraph.text.strip()  # strip() elimina espacios extra al inicio y al final
+            if paragraph.has_attr('class'):
+                class_attr = " ".join(paragraph["class"])  # Unir todos los valores de clase con espacios
+                extracted_texts.append(f"{text} (Clase: {class_attr})")
+            else:
+                extracted_texts.append(text)
+        
+        # Imprimir el texto extraído, separado por comas
+        print(", ".join(extracted_texts))
+    else:
+        print("Error en la solicitud HTTP:", response.status_code)
+except Exception as e:
+    print("Se produjo un error al hacer la solicitud:", e)
